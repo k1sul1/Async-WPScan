@@ -31,7 +31,7 @@ function onUrl (url, next) {
   var cmd = [
     'cd /usr/bin/wpscan;',
     'echo ' + url + ';',
-    './wpscan.rb --url=' + url + ' --batch |',
+    './wpscan.rb --url=' + url + ' --batch --no-color |',
     'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
     'echo ---------\n'
   ];
