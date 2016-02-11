@@ -6,6 +6,7 @@ var async = require('async');
 var request = require('request');
 var nodemailer = require('nodemailer');
 var nl2br  = require('nl2br');
+var stripcolorcodes = require('stripcolorcodes');
 
 var date = new Date();
 
@@ -31,7 +32,7 @@ function onUrl (url, next) {
   var cmd = [
     'cd /usr/bin/wpscan;',
     'echo ' + url + ';',
-    './wpscan.rb --url=' + url + ' --batch --no-color |',
+    './wpscan.rb --url=' + url + ' --batch |',
     'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
     'echo ---------\n'
   ];
@@ -65,8 +66,8 @@ function onResults (err, results) {
     from: 'Server <server@example.com>',
     to: 'you@example.com',
     subject: 'WPSCAN Results ' + padZero(date.getDate()) + padZero(date.getMonth() + 1) + padZero(date.getFullYear()),
-    text: results, // plaintext body
-    html: nl2br(results) // html body
+    text: stripcolorcodes(results), // plaintext body
+    html: nl2br(stripcolorcodes(results)) // html body
   };
 
   transporter.sendMail(mailOptions, function(err, info){
