@@ -1,5 +1,6 @@
 Asynchronous-WPScan
 ===================
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A simple NodeJS wrapper for WPScan. Takes a file (containing urls, separated with newlines) and uses WPScan on them.
 
@@ -7,6 +8,7 @@ Included PHP script filters out unnecessary data. Also emails the output to prov
 
 Usage
 =====
+
 
     npm install
     node server.js /path/to/file.txt
