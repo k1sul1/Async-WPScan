@@ -1,0 +1,17 @@
+{
+  "name": "async-wpscan",
+  "version": "0.1.0",
+  "description": "A simple NodeJS wrapper for WPScan.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  },
+  "author": "Christian Nikkanen",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.5.2",
+    "nl2br": "0.0.3",
+    "nodemailer": "^2.1.0",
+    "request": "^2.69.0"
+  }
+}
