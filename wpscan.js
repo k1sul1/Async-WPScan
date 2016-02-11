@@ -1,3 +1,8 @@
+#!/usr/bin/env node
+
+require('dotenv').config(); // load dotenv
+var wpscandir = process.env.WPSCAN_INSTALL_DIR || '/usr/bin/wpscan';
+
 var cp = require('child_process');
 var fs = require('fs');
 var path = require('path');
@@ -30,9 +35,8 @@ function scanSites (urls) {
 
 function onUrl (url, next) {
   var cmd = [
-    'cd /usr/bin/wpscan;',
     'echo ' + url + ';',
-    './wpscan.rb --url=' + url + ' --batch |',
+    wpscandir + '/wpscan.rb --url=' + url + ' --batch |',
     'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
     'echo ---------\n'
   ];
