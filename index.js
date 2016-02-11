@@ -1,40 +1,51 @@
-var async = require('async');
-var request = require('request');
 var cp = require('child_process');
 var fs = require('fs');
+var path = require('path');
+
+var async = require('async');
+var request = require('request');
 var nodemailer = require('nodemailer');
 var nl2br  = require('nl2br');
 
 var date = new Date();
 
-
-readFile(process.argv[2], onFile); // takes "third" argument which should be file
-
-function readFile (file, cb) {
-  fs.readFile(file, 'utf8', cb);
-}
+fs.readFile(process.argv[2], 'utf8', onFile); // takes "third" argument which should be file
 
 function onFile (err, data) {
-  if (err) return console.error(err);
+  if (err) {
+    console.error(err);
+    return;
+  }
 
   var urls = data.split('\n');
   scanSites(urls);
 }
 
 function scanSites (urls) {
-  async.map(urls.filter(function (url){return url;}),onUrl,onResults);
+  var filteredUrls = urls.filter(function (url){return url;});
+
+  async.map(filteredUrls, onUrl, onResults);
 }
 
 function onUrl (url, next) {
-  cp.exec('cd /usr/bin/wpscan; echo ' + url + '; ./wpscan.rb --url=' + url + ' --batch | php ' + __dirname + '/wp_check_for_vulnerabilities.php; echo ---------\n', function (err, stdout, stderr) {
-    if(err){
-      return next(err);
+  var cmd = [
+    'cd /usr/bin/wpscan;',
+    'echo ' + url + ';',
+    './wpscan.rb --url=' + url + ' --batch |',
+    'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
+    'echo ---------\n'
+  ];
+
+  cp.exec(cmd.join(' '), function (err, stdout, stderr) {
+    if (err) {
+      next(err);
+      return;
     }
-    if(stderr){
-      console.error(stderr);
-      return next('STDERR');
+    if (stderr) {
+      next(stderr);
+      return;
     }
-    if(stdout){
+    if (stdout) {
       next(null, stdout);
     }
   });
@@ -51,17 +62,21 @@ function onResults (err, results) {
   var transporter = nodemailer.createTransport('direct:?name=server.example.com');
 
   var mailOptions = {
-      from: 'Server <server@example.com>',
-      to: 'you@example.com',
-      subject: 'WPSCAN results ' + date.getDate() + (date.getMonth() + 1) + date.getFullYear(),
-      text: results, // plaintext body
-      html: nl2br(results) // html body
+    from: 'Server <server@example.com>',
+    to: 'you@example.com',
+    subject: 'WPSCAN Results ' + padZero(date.getDate()) + padZero(date.getMonth() + 1) + padZero(date.getFullYear()),
+    text: results, // plaintext body
+    html: nl2br(results) // html body
   };
 
-  transporter.sendMail(mailOptions, function(error, info){
-      if(error){
-          return console.log(error);
-      }
-      console.log('Message sent: ' + info.response);
+  transporter.sendMail(mailOptions, function(err, info){
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log('Message sent: ' + info.response);
   });
+}
+function padZero (num) {
+  return ('0' + num).slice(-2);
 }
