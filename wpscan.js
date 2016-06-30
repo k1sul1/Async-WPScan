@@ -59,6 +59,3 @@ function onResults (err, results) {
   process.stdout.write(results);
 }
 
-function padZero (num) {
-  return ('0' + num).slice(-2);
-}
