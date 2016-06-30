@@ -36,8 +36,7 @@ function scanSites (urls) {
 function onUrl (url, next) {
   var cmd = [
     'echo ' + url + ';',
-    wpscandir + '/wpscan.rb --url=' + url + ' --batch |',
-    'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
+    wpscandir + '/wpscan.rb --url=' + url + ' --batch;',
     'echo ---------\n'
   ];
 
