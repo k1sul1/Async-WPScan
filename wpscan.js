@@ -9,11 +9,6 @@ var path = require('path');
 
 var async = require('async');
 var request = require('request');
-var nodemailer = require('nodemailer');
-var nl2br  = require('nl2br');
-var stripcolorcodes = require('stripcolorcodes');
-
-var date = new Date();
 
 fs.readFile(process.argv[2], 'utf8', onFile); // takes "third" argument which should be file
 
@@ -36,8 +31,7 @@ function scanSites (urls) {
 function onUrl (url, next) {
   var cmd = [
     'echo ' + url + ';',
-    wpscandir + '/wpscan.rb --url=' + url + ' --batch |',
-    'php ' + path.join(__dirname, 'wp_check_for_vulnerabilities.php') + ';',
+    wpscandir + '/wpscan.rb --url=' + url + ' --batch;',
     'echo ---------\n'
   ];
 
@@ -63,25 +57,5 @@ function onResults (err, results) {
   }
   results = results.join('\n');
   process.stdout.write(results);
-
-  var transporter = nodemailer.createTransport('direct:?name=server.example.com');
-
-  var mailOptions = {
-    from: 'Server <server@example.com>',
-    to: 'you@example.com',
-    subject: 'WPSCAN Results ' + padZero(date.getDate()) + padZero(date.getMonth() + 1) + padZero(date.getFullYear()),
-    text: stripcolorcodes(results), // plaintext body
-    html: nl2br(stripcolorcodes(results)) // html body
-  };
-
-  transporter.sendMail(mailOptions, function(err, info){
-    if (err) {
-      console.log(err);
-      return;
-    }
-    console.log('Message sent: ' + info.response);
-  });
 }
-function padZero (num) {
-  return ('0' + num).slice(-2);
-}
+
